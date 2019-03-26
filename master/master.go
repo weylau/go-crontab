@@ -4,15 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"mcrontab/master/config"
+	"mcrontab/master/httpserver"
 	"runtime"
 )
 
 type Master struct {
-	configFile string
 }
 
 var (
-	G_config *config.Config
+	configFile string
 )
 
 func (this *Master) Run() {
@@ -20,34 +20,49 @@ func (this *Master) Run() {
 		err error
 	)
 
-	if err = this.Init(); err != nil {
+	if err = this.initMaster(); err != nil {
 		goto Err
 	}
 Err:
 	fmt.Println(err)
 }
 
-func (this *Master) Init() (err error) {
-	this.initArgs()
-	this.initEnv()
-	if G_config, err = config.LoadConfig(this.configFile); err != nil {
+func (this *Master) initMaster() (err error) {
+	initArgs()
+	initEnv()
+	if err = initConfig(); err != nil {
+		return
+	}
+	if err = initHttpServer(); err != nil {
 		return
 	}
 	return
 }
 
 //初始化命令行参数
-func (this *Master) initArgs() {
-	flag.StringVar(&this.configFile, "config", "config/config.json", "master配置文件")
+func initArgs() {
+	flag.StringVar(&configFile, "config", "src/mcrontab/master/config/config.json", "master配置文件")
 	flag.Parse()
 }
 
 //初始化线程数量
-func (this *Master) initEnv() {
+func initEnv() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-func (this *Master) InitHttpServer() (err error) {
-
+//加载配置文件
+func initConfig() (err error) {
+	if err = config.LoadConfig(configFile); err != nil {
+		return
+	}
 	return
+}
+
+func initHttpServer() (err error) {
+	err = httpserver.InitHttpServer()
+	return
+}
+
+func NewMaster() *Master {
+	return &Master{}
 }

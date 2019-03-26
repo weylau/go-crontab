@@ -11,8 +11,12 @@ type Config struct {
 	HttpServerWriteTimeout int `json:"http_server_write_timeout"`
 }
 
+var (
+	G_config *Config
+)
+
 //加载配置
-func LoadConfig(filename string) (config *Config, err error) {
+func LoadConfig(filename string) (err error) {
 	var (
 		content []byte
 		conf    Config
@@ -25,5 +29,6 @@ func LoadConfig(filename string) (config *Config, err error) {
 	if err = json.Unmarshal(content, &conf); err != nil {
 		return
 	}
-	return &conf, nil
+	G_config = &conf
+	return
 }

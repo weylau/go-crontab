@@ -1,10 +1,10 @@
 {
   "http服务监听端口" : "http服务监听端口",
-  "http_server_port" : "8081",
+  "http_server_port" : 8081,
 
   "http服务读数据超时时间" : "单位毫秒",
-  "http_server_read_timeout" : "8000",
+  "http_server_read_timeout" : 8000,
 
   "http服务写数据超时时间" : "单位毫秒",
-  "http_server_write_timeout" : "8000"
+  "http_server_write_timeout" : 8000
 }

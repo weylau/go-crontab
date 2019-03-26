@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "mcrontab/master"
 
+func main() {
+	master.NewMaster().Run()
 }
