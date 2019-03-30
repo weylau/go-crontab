@@ -6,9 +6,11 @@ import (
 )
 
 type Config struct {
-	HttpServerPort         int `json:"http_server_port"`
-	HttpServerReadTimeout  int `json:"http_server_read_timeout"`
-	HttpServerWriteTimeout int `json:"http_server_write_timeout"`
+	HttpServerPort           int    `json:"http_server_port"`
+	HttpServerReadTimeout    int    `json:"http_server_read_timeout"`
+	HttpServerWriteTimeout   int    `json:"http_server_write_timeout"`
+	EtcdServerAddr           string `json:"etcd_server_addr"`
+	EtcdServerConnectTimeout int    `json:"etcd_server_connect_timeout"`
 }
 
 var (

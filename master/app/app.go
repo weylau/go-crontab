@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"flag"
@@ -8,26 +8,26 @@ import (
 	"runtime"
 )
 
-type Master struct {
+type App struct {
 }
 
 var (
 	configFile string
 )
 
-func (this *Master) Run() {
+func (this *App) Run() {
 	var (
 		err error
 	)
 
-	if err = this.initMaster(); err != nil {
+	if err = this.initApp(); err != nil {
 		goto Err
 	}
 Err:
 	fmt.Println(err)
 }
 
-func (this *Master) initMaster() (err error) {
+func (this *App) initApp() (err error) {
 	initArgs()
 	initEnv()
 	if err = initConfig(); err != nil {
@@ -63,6 +63,6 @@ func initHttpServer() (err error) {
 	return
 }
 
-func NewMaster() *Master {
-	return &Master{}
+func NewApp() *App {
+	return &App{}
 }
