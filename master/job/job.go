@@ -26,10 +26,11 @@ func (this *JobManager) List() (joblist []*common.Job, err error) {
 		getResp *clientv3.GetResponse
 		kvPair  *mvccpb.KeyValue
 		job     *common.Job
+		ctx     context.Context
 	)
 	dirKey = common.JOB_SAVE_DIR
-
-	if getResp, err = this.kv.Get(context.TODO(), dirKey, clientv3.WithPrefix()); err != nil {
+	ctx, _ = context.WithTimeout(context.TODO(), time.Duration(config.G_config.EtcdServerOptionTimeout)*time.Millisecond)
+	if getResp, err = this.kv.Get(ctx, dirKey, clientv3.WithPrefix()); err != nil {
 		return
 	}
 	joblist = make([]*common.Job, 0)
@@ -52,17 +53,18 @@ func (this *JobManager) Save(job *common.Job) (oldjob *common.Job, err error) {
 		value    []byte
 		oldvalue common.Job
 		putResp  *clientv3.PutResponse
+		ctx      context.Context
 	)
 	key = common.JOB_SAVE_DIR + job.JobName
 	if value, err = json.Marshal(job); err != nil {
 		return
 	}
-
-	if putResp, err = this.kv.Put(context.TODO(), key, string(value), clientv3.WithPrevKV()); err != nil {
+	ctx, _ = context.WithTimeout(context.TODO(), time.Duration(config.G_config.EtcdServerOptionTimeout)*time.Millisecond)
+	if putResp, err = this.kv.Put(ctx, key, string(value), clientv3.WithPrevKV()); err != nil {
 		return
 	}
 	if putResp.PrevKv != nil {
-		if err = json.Unmarshal([]byte(putResp.PrevKv.Value), oldvalue); err != nil {
+		if err = json.Unmarshal([]byte(putResp.PrevKv.Value), &oldvalue); err != nil {
 			return
 		}
 		oldjob = &oldvalue
@@ -77,12 +79,13 @@ func (this *JobManager) Delete(jobName string) (oldjob *common.Job, err error) {
 		key      string
 		delResp  *clientv3.DeleteResponse
 		oldvalue common.Job
+		ctx      context.Context
 	)
 
 	key = common.JOB_SAVE_DIR + jobName
-
+	ctx, _ = context.WithTimeout(context.TODO(), time.Duration(config.G_config.EtcdServerOptionTimeout)*time.Millisecond)
 	// 从etcd中删除它
-	if delResp, err = this.kv.Delete(context.TODO(), key, clientv3.WithPrevKV()); err != nil {
+	if delResp, err = this.kv.Delete(ctx, key, clientv3.WithPrevKV()); err != nil {
 		return
 	}
 

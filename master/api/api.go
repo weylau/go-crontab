@@ -1,8 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
+	"mcrontab/common"
 	"mcrontab/master/config"
+	"mcrontab/master/job"
 	"net"
 	"net/http"
 	"strconv"
@@ -30,34 +33,102 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 //任务列表
 func handleJobList(w http.ResponseWriter, r *http.Request) {
 	var (
-		content []byte
+		err     error
+		bytes   []byte
+		joblist []*common.Job
 	)
+	if joblist, err = job.G_jobMamager.List(); err != nil {
+		goto ERR
+	}
 
-	content = []byte("<h1>handleJobList</h1>")
+	if bytes, err = common.BuildResponse(0, "success", joblist); err != nil {
+		goto ERR
+	}
+	responseJson(w, bytes)
+	return
+ERR:
+	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
+		fmt.Println("err :", string(bytes))
+		responseJson(w, bytes)
+		return
+	}
 
-	w.Write(content)
 }
 
 //任务更新保存
 func handleJobSave(w http.ResponseWriter, r *http.Request) {
 	var (
+		err     error
 		content []byte
+		jobdata string
+		newjob  common.Job
+		oldjob  *common.Job
+		bytes   []byte
 	)
 
-	content = []byte("<h1>handleJobList</h1>")
+	if err = r.ParseForm(); err != nil {
+		goto ERR
+	}
+	jobdata = r.PostForm.Get("job")
+	newjob = common.Job{}
+	content = []byte(jobdata)
+	if err = json.Unmarshal(content, &newjob); err != nil {
+		goto ERR
+	}
 
-	w.Write(content)
+	if oldjob, err = job.G_jobMamager.Save(&newjob); err != nil {
+		goto ERR
+	}
+
+	if bytes, err = common.BuildResponse(0, "success", oldjob); err != nil {
+		goto ERR
+	}
+	fmt.Println(string(bytes))
+	responseJson(w, bytes)
+	return
+ERR:
+	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
+		responseJson(w, bytes)
+	}
 }
 
 //任务删除
 func handleJobDelete(w http.ResponseWriter, r *http.Request) {
 	var (
-		content []byte
+		err    error // interface{}
+		name   string
+		oldjob *common.Job
+		bytes  []byte
 	)
 
-	content = []byte("<h1>handleJobDelete</h1>")
+	// POST:   a=1&b=2&c=3
+	if err = r.ParseForm(); err != nil {
+		goto ERR
+	}
 
-	w.Write(content)
+	// 删除的任务名
+	name = r.Form.Get("name")
+	fmt.Println(name)
+	// 去删除任务
+	if oldjob, err = job.G_jobMamager.Delete(name); err != nil {
+		goto ERR
+	}
+
+	// 正常应答
+	if bytes, err = common.BuildResponse(0, "success", oldjob); err == nil {
+		responseJson(w, bytes)
+	}
+	return
+
+ERR:
+	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
+		responseJson(w, bytes)
+	}
+}
+
+func responseJson(w http.ResponseWriter, content []byte) (int, error) {
+	w.Header().Add("Content-Type", "application/json;charset=UTF-8")
+	return w.Write(content)
 }
 
 func InitApiServer() (err error) {
@@ -82,6 +153,7 @@ func InitApiServer() (err error) {
 	httpServ = &http.Server{
 		ReadTimeout:  time.Duration(config.G_config.HttpServerReadTimeout) * time.Millisecond,
 		WriteTimeout: time.Duration(config.G_config.HttpServerWriteTimeout) * time.Millisecond,
+		IdleTimeout:  time.Duration(config.G_config.HttpServerIdleTimeout) * time.Millisecond,
 		Handler:      mux,
 	}
 	G_apiServer = &ApiServer{

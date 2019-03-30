@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mcrontab/master/api"
 	"mcrontab/master/config"
+	"mcrontab/master/job"
 	"runtime"
 )
 
@@ -33,9 +34,13 @@ func (this *App) initApp() (err error) {
 	if err = initConfig(); err != nil {
 		return
 	}
+	if err = initJobManager(); err != nil {
+		return
+	}
 	if err = initApiServer(); err != nil {
 		return
 	}
+
 	return
 }
 
@@ -60,6 +65,11 @@ func initConfig() (err error) {
 
 func initApiServer() (err error) {
 	err = api.InitApiServer()
+	return
+}
+
+func initJobManager() (err error) {
+	err = job.InitJobManager()
 	return
 }
 
