@@ -3,8 +3,8 @@ package app
 import (
 	"flag"
 	"fmt"
+	"mcrontab/master/api"
 	"mcrontab/master/config"
-	"mcrontab/master/httpserver"
 	"runtime"
 )
 
@@ -33,7 +33,7 @@ func (this *App) initApp() (err error) {
 	if err = initConfig(); err != nil {
 		return
 	}
-	if err = initHttpServer(); err != nil {
+	if err = initApiServer(); err != nil {
 		return
 	}
 	return
@@ -58,8 +58,8 @@ func initConfig() (err error) {
 	return
 }
 
-func initHttpServer() (err error) {
-	err = httpserver.InitHttpServer()
+func initApiServer() (err error) {
+	err = api.InitApiServer()
 	return
 }
 

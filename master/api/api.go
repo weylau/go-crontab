@@ -1,4 +1,4 @@
-package httpserver
+package api
 
 import (
 	"fmt"
@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-type HttpServer struct {
+type ApiServer struct {
 	Serv *http.Server
 }
 
 var (
-	G_httpServer *HttpServer
+	G_apiServer *ApiServer
 )
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +60,7 @@ func handleJobDelete(w http.ResponseWriter, r *http.Request) {
 	w.Write(content)
 }
 
-func InitHttpServer() (err error) {
+func InitApiServer() (err error) {
 	var (
 		mux      *http.ServeMux
 		listener net.Listener
@@ -84,7 +84,7 @@ func InitHttpServer() (err error) {
 		WriteTimeout: time.Duration(config.G_config.HttpServerWriteTimeout) * time.Millisecond,
 		Handler:      mux,
 	}
-	G_httpServer = &HttpServer{
+	G_apiServer = &ApiServer{
 		Serv: httpServ,
 	}
 	err = httpServ.Serve(listener)
