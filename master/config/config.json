@@ -1,0 +1,22 @@
+{
+  "http服务监听端口" : "http服务监听端口",
+  "http_server_port" : 8081,
+
+  "http服务读数据超时时间" : "单位毫秒",
+  "http_server_read_timeout" : 8000,
+
+  "http服务写数据超时时间" : "单位毫秒",
+  "http_server_write_timeout" : 8000,
+
+  "http客户端等待超时时间" : "单位毫秒",
+  "http_server_idle_timeout" : 8000,
+
+  "etcd服务地址配置" : "用逗号隔开配置集群",
+  "etcd_server_addr" : "192.168.0.110:2379",
+
+  "etcd服务连接超时时间" : "单位毫秒",
+  "etcd_server_connect_timeout" : 8000,
+
+  "etcd服务操作超时时间" : "单位毫秒",
+  "etcd_server_option_timeout" : 8000
+}

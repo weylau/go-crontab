@@ -1,0 +1,10 @@
+{
+  "etcd服务地址配置" : "用逗号隔开配置集群",
+  "etcd_server_addr" : "192.168.0.110:2379",
+
+  "etcd服务连接超时时间" : "单位毫秒",
+  "etcd_server_connect_timeout" : 8000,
+
+  "etcd服务操作超时时间" : "单位毫秒",
+  "etcd_server_option_timeout" : 8000
+}
